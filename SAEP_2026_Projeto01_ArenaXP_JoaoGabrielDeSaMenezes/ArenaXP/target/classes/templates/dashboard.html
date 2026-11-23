@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Início')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topo('dashboard')}"></header>
+
+<main class="conteudo">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <h1>Olá, <span th:text="${usuarioLogado.nome()}">Usuário</span>!</h1>
+    <p class="subtitulo">Resumo rápido do almoxarifado da ArenaXP.</p>
+
+    <section class="cards">
+        <div class="card-resumo">
+            <span class="card-numero" th:text="${totalEquipamentos}">0</span>
+            <span class="card-rotulo">Equipamentos cadastrados</span>
+        </div>
+        <div class="card-resumo" th:classappend="${totalEmAlerta > 0} ? 'card-critico' : 'card-ok'">
+            <span class="card-numero" th:text="${totalEmAlerta}">0</span>
+            <span class="card-rotulo">Itens em alerta crítico</span>
+        </div>
+    </section>
+
+    <section class="atalhos">
+        <a class="btn btn-primario" th:href="@{/equipamentos}">Equipamentos</a>
+        <a class="btn btn-primario" th:href="@{/estoque}">Gestão de Estoque</a>
+        <a class="btn btn-primario" th:href="@{/movimentacoes}">Histórico de Movimentações</a>
+    </section>
+
+    <section th:if="${!equipamentosCriticos.isEmpty()}">
+        <h2>⚠ Itens com estoque crítico</h2>
+        <div class="tabela-wrap">
+            <table>
+                <thead>
+                <tr><th>Código</th><th>Equipamento</th><th>Categoria</th><th>Qtd. atual</th><th>Mínimo</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${equipamentosCriticos}">
+                    <td th:text="${e.codigoPatrimonio()}">AXP-000</td>
+                    <td th:text="${e.nome()}">Nome</td>
+                    <td th:text="${e.categoria()}">Categoria</td>
+                    <td><span class="badge badge-critico" th:text="${e.quantidadeAtual()}">0</span></td>
+                    <td th:text="${e.estoqueMinimo()}">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <p th:if="${equipamentosCriticos.isEmpty()}" class="vazio">Nenhum equipamento abaixo do estoque mínimo. ✔</p>
+</main>
+</body>
+</html>

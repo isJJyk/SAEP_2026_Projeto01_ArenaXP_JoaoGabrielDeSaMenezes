@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Equipamentos')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topo('equipamentos')}"></header>
+
+<main class="conteudo">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <div class="titulo-linha">
+        <h1>Equipamentos</h1>
+        <a class="btn btn-primario" th:href="@{/equipamentos/novo}">+ Novo equipamento</a>
+    </div>
+
+
+    <form th:action="@{/equipamentos}" method="get" class="filtros">
+        <input type="text" name="busca" th:value="${busca}" placeholder="Buscar por nome ou código de patrimônio">
+        <select name="categoria">
+            <option value="">Todas as categorias</option>
+            <option th:each="c : ${categorias}" th:value="${c}" th:text="${c}"
+                    th:selected="${c.equalsIgnoreCase(categoriaSelecionada)}">Categoria</option>
+        </select>
+        <button type="submit" class="btn btn-primario">Filtrar</button>
+        <a class="btn btn-secundario" th:href="@{/equipamentos}">Limpar</a>
+    </form>
+
+    <div class="tabela-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Código</th><th>Nome</th><th>Categoria</th><th>Especificação técnica</th>
+                <th>Qtd. atual</th><th>Mínimo</th><th>Status</th><th>Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${equipamentos}">
+                <td th:text="${e.codigoPatrimonio()}">AXP-000</td>
+                <td th:text="${e.nome()}">Nome</td>
+                <td th:text="${e.categoria()}">Categoria</td>
+                <td th:text="${e.especificacaoTecnica()}">Especificação</td>
+                <td th:text="${e.quantidadeAtual()}">0</td>
+                <td th:text="${e.estoqueMinimo()}">0</td>
+                <td>
+                    <span class="badge badge-critico" th:if="${e.estoqueCritico()}">CRÍTICO</span>
+                    <span class="badge badge-ok" th:unless="${e.estoqueCritico()}">OK</span>
+                </td>
+                <td class="acoes">
+                    <a class="btn btn-pequeno btn-secundario" th:href="@{/equipamentos/{id}/editar(id=${e.id()})}">Editar</a>
+                    <form th:action="@{/equipamentos/{id}/excluir(id=${e.id()})}" method="post"
+                          onsubmit="return confirm('Deseja realmente excluir este equipamento?');">
+                        <button type="submit" class="btn btn-pequeno btn-perigo">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${equipamentos.isEmpty()}">
+                <td colspan="8" class="vazio">Nenhum equipamento encontrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

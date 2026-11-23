@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' • ArenaXP'">ArenaXP</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+
+<header class="topo" th:fragment="topo(ativo)">
+    <div class="topo-inner">
+        <a class="marca" th:href="@{/}">Arena<span>XP</span></a>
+        <nav class="menu">
+            <a th:href="@{/}" th:classappend="${ativo == 'dashboard'} ? 'ativo'">Início</a>
+            <a th:href="@{/equipamentos}" th:classappend="${ativo == 'equipamentos'} ? 'ativo'">Equipamentos</a>
+            <a th:href="@{/estoque}" th:classappend="${ativo == 'estoque'} ? 'ativo'">Gestão de Estoque</a>
+            <a th:href="@{/movimentacoes}" th:classappend="${ativo == 'movimentacoes'} ? 'ativo'">Movimentações</a>
+        </nav>
+        <div class="usuario" th:if="${usuarioLogado != null}">
+            <span class="usuario-nome">
+                <strong th:text="${usuarioLogado.nome()}">Nome do usuário</strong>
+                <small th:text="${usuarioLogado.perfil()}">PERFIL</small>
+            </span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-sair">Sair</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+
+<div th:fragment="mensagens">
+    <div class="alerta alerta-critico" role="alert" th:if="${alertaCritico != null}">
+        <strong>⚠ ESTOQUE CRÍTICO / ABAIXO DO MÍNIMO</strong>
+        <span th:text="${alertaCritico}">Equipamento com saldo no limite.</span>
+    </div>
+    <div class="alerta alerta-sucesso" role="status" th:if="${sucesso != null}" th:text="${sucesso}">Sucesso</div>
+    <div class="alerta alerta-erro" role="alert" th:if="${erro != null}" th:text="${erro}">Erro</div>
+    <div class="alerta alerta-erro" role="alert" th:if="${erros != null and !erros.isEmpty()}">
+        <ul>
+            <li th:each="e : ${erros}" th:text="${e}">Mensagem de erro</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

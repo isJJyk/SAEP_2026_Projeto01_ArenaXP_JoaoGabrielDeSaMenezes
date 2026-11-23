@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Gestão de Estoque')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: topo('estoque')}"></header>
+
+<main class="conteudo">
+    <div th:replace="~{fragments/layout :: mensagens}"></div>
+
+    <h1>Gestão de Estoque</h1>
+
+
+    <div class="alerta alerta-critico" role="alert" th:if="${!equipamentosCriticos.isEmpty()}">
+        <strong>⚠ ESTOQUE CRÍTICO / ABAIXO DO MÍNIMO:</strong>
+        <span th:each="c, it : ${equipamentosCriticos}">
+            <span th:text="${c.nome()} + ' (' + ${c.quantidadeAtual()} + '/' + ${c.estoqueMinimo()} + ')'">Item (1/2)</span><span th:unless="${it.last}">, </span>
+        </span>
+    </div>
+
+
+    <section class="form-card">
+        <h2>Registrar movimentação</h2>
+        <form th:action="@{/estoque/movimentar}" method="post" class="form">
+            <div class="grade-form">
+                <div>
+                    <label for="equipamentoId">Equipamento</label>
+                    <select id="equipamentoId" name="equipamentoId" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="e : ${equipamentos}" th:value="${e.id()}"
+                                th:text="${e.nome() + ' (' + e.codigoPatrimonio() + ') — saldo: ' + e.quantidadeAtual()}"
+                                th:selected="${form.equipamentoId() != null and form.equipamentoId() == e.id()}">Equipamento</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tipo</label>
+                    <div class="radios">
+                        <label><input type="radio" name="tipoMovimentacao" value="ENTRADA" required
+                                      th:checked="${form.tipoMovimentacao() != null and form.tipoMovimentacao().name() == 'ENTRADA'}"> Entrada</label>
+                        <label><input type="radio" name="tipoMovimentacao" value="SAIDA"
+                                      th:checked="${form.tipoMovimentacao() != null and form.tipoMovimentacao().name() == 'SAIDA'}"> Saída</label>
+                    </div>
+                </div>
+                <div>
+                    <label for="quantidade">Quantidade</label>
+                    <input type="number" id="quantidade" name="quantidade" min="1" step="1" required
+                           th:value="${form.quantidade()}">
+                </div>
+                <div>
+                    <label for="dataHora">Data/hora</label>
+                    <input type="datetime-local" id="dataHora" name="dataHora" th:value="${dataHoraForm}">
+                </div>
+            </div>
+            <label for="observacaoEvento">Observação do evento/torneio</label>
+            <input type="text" id="observacaoEvento" name="observacaoEvento" maxlength="255"
+                   placeholder="Ex.: Copa Universitária FPS - Palco A" th:value="${form.observacaoEvento()}">
+            <div class="form-botoes">
+                <button type="submit" class="btn btn-primario">Registrar movimentação</button>
+            </div>
+        </form>
+    </section>
+
+
+    <h2>Equipamentos em estoque <small>(A–Z)</small></h2>
+    <div class="tabela-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Nome</th><th>Código</th><th>Categoria</th><th>Qtd. atual</th><th>Mínimo</th><th>Status</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${equipamentos}" th:classappend="${e.estoqueCritico()} ? 'linha-critica'">
+                <td th:text="${e.nome()}">Nome</td>
+                <td th:text="${e.codigoPatrimonio()}">AXP-000</td>
+                <td th:text="${e.categoria()}">Categoria</td>
+                <td><strong th:text="${e.quantidadeAtual()}">0</strong></td>
+                <td th:text="${e.estoqueMinimo()}">0</td>
+                <td>
+                    <span class="badge badge-critico" th:if="${e.estoqueCritico()}">ESTOQUE CRÍTICO</span>
+                    <span class="badge badge-ok" th:unless="${e.estoqueCritico()}">OK</span>
+                </td>
+                <td><a class="btn btn-pequeno btn-secundario" th:href="@{/estoque(equipamentoId=${e.id()})}">Movimentar</a></td>
+            </tr>
+            <tr th:if="${equipamentos.isEmpty()}">
+                <td colspan="7" class="vazio">Nenhum equipamento cadastrado.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
